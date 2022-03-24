@@ -11,10 +11,10 @@ import calendar
 githubpath = './data/'
 
 # Import from Excel file, 4 different sheets
-df_customers = pd.read_excel(githubpath + "fake_data.xlsx", sheet_name="customers")
-df_order = pd.read_excel(githubpath + "fake_data.xlsx", sheet_name="order")
-df_employee = pd.read_excel(githubpath + "fake_data.xlsx", sheet_name="employee")
-df_products = pd.read_excel(githubpath + "fake_data.xlsx", sheet_name="products")
+df_customers = pd.read_excel(githubpath + "my_shop_data.xlsx", sheet_name="customers")
+df_order = pd.read_excel(githubpath + "my_shop_data.xlsx", sheet_name="order")
+df_employee = pd.read_excel(githubpath + "my_shop_data.xlsx", sheet_name="employee")
+df_products = pd.read_excel(githubpath + "my_shop_data.xlsx", sheet_name="products")
 
 
 def get_data():
@@ -34,10 +34,16 @@ def get_data():
     # ***************************************
     # Data - Relationer
     # ***************************************
-    order = pd.merge(df_order, df_products, on='product_id')
-    order = pd.merge(order, df_employee, on='employee_id')
-    order = pd.merge(order, df_customers, on='customer_id')
-
+    order = pd.merge(df_order, df_products, how='left', on='product_id')
+    order = pd.merge(order, df_employee,how='left', on='employee_id')
+    order = pd.merge(order, df_customers, how='left', on='customer_id')
+    
+    #Replace unknown words 
+    order['productname'] = order['productname'].replace(np.nan, 'unknown')
+    order['type'] = order['type'].replace(np.nan, 'unknown')
+    order['cust_name'] = order['cust_name'].fillna(0)
+    order['city'] = order['city'].fillna(0)
+    order['country'] = order['country'].fillna(0)
     # Order - Select colomns
     order = order[['order_id', 
                 'product_id', 'productname', 'type',
